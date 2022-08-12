@@ -29,6 +29,7 @@
     "@types/passport": "^1.0.10",
     "@types/passport-local": "^1.0.34",
     "cors": "^2.8.5",
+    "express-session": "^1.17.3",
     "mongoose": "^6.5.0",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
