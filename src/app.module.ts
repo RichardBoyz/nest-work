@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UsersModule } from './users/users.module';
       'mongodb+srv://r1382333:r8654321@cluster0.ttwoxij.mongodb.net/nestjs-demo?retryWrites=true&w=majority',
     ),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
