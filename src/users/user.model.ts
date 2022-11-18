@@ -6,7 +6,10 @@ export type UserDocument = User & Document;
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
-  name: string;
+  fullName: string;
+
+  @Prop({ required: true })
+  nickName: string;
 
   @Prop({ required: true })
   username: string;
@@ -21,16 +24,28 @@ export class User {
   phone: string;
 
   @Prop()
+  role: string;
+
+  @Prop()
+  workSpace: number;
+
+  @Prop()
   refreshToken: string;
+
+  @Prop({ default: Date.now() })
+  updateDate: Date;
 }
 
 export const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String },
+    fullName: { type: String, required: true },
+    nickName: { type: String, required: true },
     username: { type: String, required: true },
     password: { type: String, required: true },
-    phone: { type: String },
+    email: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    role: { type: String, default: 'user' },
+    workSpace: { type: Number, default: 122 },
     refreshToken: { type: String, default: '' },
   },
   {

@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -15,33 +19,58 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
+  extractUserPublicData(data: any) {
+    const {
+      createdAt,
+      updatedAt,
+      password,
+      refreshToken,
+      __v,
+      _id,
+      id,
+      ...rest
+    } = data;
+    delete rest._id;
+    rest.id = id ?? _id;
+    return rest;
+  }
+
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.findOne(username);
 
     if (user && user.password === password) {
-      const { password, ...rest } = user;
-      return rest;
+      const userInfo = this.extractUserPublicData(user);
+      return userInfo;
     }
 
     return null;
   }
 
   async signup(user: User) {
-    const hash = this.hashData(user.password);
+    try {
+      const hash = this.hashData(user.password);
 
-    const newUser = await this.usersService.createUser(user);
+      const newUser = await this.usersService.createUser(user);
 
-    const tokens = await this.getTokens(user.username, user.name, newUser);
+      const tokens = await this.getTokens(this.extractUserPublicData(newUser));
 
-    await this.updateRtHash(user.username, tokens.refreshToken);
-    return tokens;
+      await this.updateRtHash(user.username, tokens.refreshToken);
+      return tokens;
+    } catch (error) {
+      throw new BadRequestException('Data invalid');
+    }
   }
 
   async login(user: any) {
-    const payload = { name: user.name, username: user.username, id: user._id };
+    const payload = {
+      fullName: user.fullName,
+      username: user.username,
+      id: user._id,
+    };
+    const userInfo = this.extractUserPublicData(user);
     const refreshToken = await this.jwtService.signAsync(
       {
-        ...payload,
+        ...userInfo,
       },
       {
         secret: 'RT-SECRET',
@@ -56,9 +85,7 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken,
-      id: user._id,
-      name: user.name,
-      username: user.username,
+      ...userInfo,
     };
   }
 
@@ -76,12 +103,10 @@ export class AuthService {
     await this.usersService.updateUser(username, { refreshToken: hash });
   }
 
-  async getTokens(username: string, name: string, id: string) {
+  async getTokens(userInfo: User) {
     const accessToken = await this.jwtService.signAsync(
       {
-        id,
-        name,
-        username,
+        ...userInfo,
       },
       {
         secret: 'SECRET',
@@ -90,9 +115,7 @@ export class AuthService {
     );
     const refreshToken = await this.jwtService.signAsync(
       {
-        id,
-        name,
-        username,
+        ...userInfo,
       },
       {
         secret: 'RT-SECRET',
@@ -108,16 +131,22 @@ export class AuthService {
 
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.getUserById(userId);
+
     if (!user) throw new ForbiddenException('你是誰');
-    if (!user.refreshToken) throw new ForbiddenException('抓到你囉');
+    if (!user.refreshToken) throw new ForbiddenException('抓到你囉1');
     const isMatchRefreshToken = await bcrypt.compare(
       refreshToken,
       user.refreshToken,
     );
     if (!isMatchRefreshToken) throw new ForbiddenException('抓到你囉');
 
-    const tokens = await this.getTokens(user.username, user.name, userId);
+    const userInfo = this.extractUserPublicData(user);
+    const tokens = await this.getTokens(userInfo);
+
     await this.updateRtHash(user.username, tokens.refreshToken);
-    return tokens;
+
+    return { ...tokens, ...userInfo };
   }
 }
+
+// fffff

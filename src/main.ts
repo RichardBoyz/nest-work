@@ -5,7 +5,12 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  });
 
   // Session
   // app.use(

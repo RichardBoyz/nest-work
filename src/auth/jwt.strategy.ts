@@ -17,9 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // use userservice to get user by id (subload.sub)
     // const user=await this.usersService.findOne()
     return {
-      id: payload.id,
-      username: payload.username,
-      name: payload.name,
+      ...payload,
     };
     // this return is req.user
   }
