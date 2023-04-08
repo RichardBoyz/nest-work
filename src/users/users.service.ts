@@ -14,22 +14,6 @@ import { User } from './user.model';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
-  // private readonly users: User[] = [
-  //   {
-  //     id: '1',
-  //     name: 'rich',
-  //     username: 'richard',
-  //     password: '223',
-  //     email: 't@t.com',
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'bi',
-  //     username: 'bill',
-  //     password: '133',
-  //     email: 'f@t.com',
-  //   },
-  // ];
   async getUserById(id: string) {
     return this.userModel.findOne({ _id: id }).lean();
   }
