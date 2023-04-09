@@ -65,7 +65,7 @@ export class AuthService {
     const payload = {
       fullName: user.fullName,
       username: user.username,
-      id: user._id,
+      id: user.id,
     };
     const userInfo = this.extractUserPublicData(user);
     const refreshToken = await this.jwtService.signAsync(
