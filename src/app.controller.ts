@@ -16,6 +16,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { JwtRefreshGuard } from './auth/jwt-refresh.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { User } from './users/user.model';
+import { Public } from './auth/jwt.decorator';
 
 @Controller()
 export class AppController {
@@ -41,6 +42,7 @@ export class AppController {
     return this.authService.signup(user);
   }
 
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Request() req): any {
