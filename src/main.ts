@@ -5,19 +5,25 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  });
 
-  app.use(
-    session({
-      secret: 'RichardBoyz', // TODO: get from env vars
-      resave: false,
-      saveUninitialized: false,
-      cookie: { maxAge: 3600000 },
-    }),
-  );
+  // Session
+  // app.use(
+  //   session({
+  //     secret: 'RichardBoyz', // TODO: get from env vars
+  //     resave: false,
+  //     saveUninitialized: false,
+  //     cookie: { maxAge: 3600000 },
+  //   }),
+  // );
 
-  app.use(passport.initialize());
-  app.use(passport.session());
+  // app.use(passport.initialize());
+  // app.use(passport.session());
 
   await app.listen(process.env.PORT || 3000);
 }
