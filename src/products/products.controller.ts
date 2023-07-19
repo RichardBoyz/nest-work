@@ -10,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Public } from '../auth/jwt.decorator';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -29,6 +30,7 @@ export class ProductsController {
     return generatedId;
   }
 
+  @Public()
   @Get()
   async getAllProducts() {
     const products = await this.productsService.getProducts();
